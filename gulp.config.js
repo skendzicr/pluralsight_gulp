@@ -1,20 +1,27 @@
-const client = './src/client/';
-const clientApp = client + 'app/';
-const temp = './.tmp/';
-const server = './src/server/';
+import wiredep from 'wiredep';
+
 const build = './build/';
-const root = './';
 const bower = {
         json: require('./bower.json'),
         directory: './bower_components',
         ignorePath: '../..'  
 };
-
+const bowerFiles = wiredep({devDependencies: true})['js'];
+const client = './src/client/';
+const clientApp = client + 'app/';
 const packages = [
     './package.json',
     './bower.json',
 
-]
+];
+const root = '.';
+const report = './report/';
+const server = './src/server/';
+const temp = './.tmp/';
+
+
+const serverIntegrationSpecs = [client + 'tests/server-integration/**/*.spec.js'];
+const specHelpers = [client + 'test-helpers/**/*.js'];
 
 const getWiredepDefaultOptions = () =>{
         const options = {
@@ -24,6 +31,36 @@ const getWiredepDefaultOptions = () =>{
         };
         return options;
 };
+
+const getKarmaOptions = () => {
+    let options = {
+        files: [].concat(
+            bowerFiles, 
+            specHelpers, 
+            client + '**/*.module.js',  
+            client + '**/*.js',
+            serverIntegrationSpecs ),
+        exclude: [],
+        coverage: {
+            dir: report + 'coverage',
+            reporters: [
+                {
+                    type: 'html', subdir: 'report-html',
+                },
+                {
+                    type: 'lcov', subdir: 'report-lcov',
+                },                
+                {
+                    type: 'text-summary'
+                }
+            ]
+        },
+        preprocessors: {}
+    };
+    options.preprocessors[clientApp + '**/!(*.spec)+(*.js)'] = ['coverage'];
+    return options;
+};
+
 export default {
     /**
      * Node Settings
@@ -46,6 +83,14 @@ export default {
             root: 'app/'
         }
     },
+
+    /**
+     * Karma config
+     */
+    karma: getKarmaOptions(),
+    serverIntegrationSpecs,
+    specHelpers,
+    report,
 
     /**
      * File paths

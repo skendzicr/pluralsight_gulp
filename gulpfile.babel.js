@@ -5,6 +5,7 @@ import del from 'del';
 import wiredep from 'wiredep';
 import browserSync from 'browser-sync';
 import useref from 'gulp-useref';
+import carma from 'karma';
 
 import loadplugins from 'gulp-load-plugins';
 const $ = loadplugins ({lazy: true});
@@ -218,6 +219,30 @@ const startBrowserSync = isDev => {
 
 };
 
+const startTests = (singleRun) => {
+  const karma = carma.server;
+  let excludeFiles = [];
+  const serverSpecs = config.serverIntegrationSpecs;
+
+  excludeFiles = serverSpecs;
+
+  const karmaCompleted = karmaResult => {
+    log('Karma completed');
+    if (karmaResult === 1) {
+      log('karma: tests failed with code ' + karmaResult );
+    } else {
+      return;
+    }
+  };
+
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    exclude: excludeFiles,
+    singleRun: !!singleRun
+  },karmaCompleted);
+
+};
+
 const serve = isDev =>{
 
   const nodeOptions = {
@@ -290,4 +315,8 @@ gulp.task('bump', ()=>{
   .pipe($.print())
   .pipe($.bump(options))
   .pipe(gulp.dest(config.root));
+});
+
+gulp.task ('test',['vet','templatecache'], () =>{
+  startTests(true);
 });

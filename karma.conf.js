@@ -1,10 +1,9 @@
+import gulpConfig from './gulp.config';
+process.env.PHANTOMJS_BIN = './node_modules/.bin/phantomjs';
 module.exports = function(config) {
-    var gulpConfig = require('./gulp.config')();
-
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: './',
-
         // frameworks to use
         // some available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['mocha', 'chai', 'sinon', 'chai-sinon'],
@@ -15,9 +14,9 @@ module.exports = function(config) {
         // list of files to exclude
         exclude: gulpConfig.karma.exclude,
 
-        proxies: {
+        /*proxies: {
             '/': 'http://localhost:8888/'
-        },
+        },*/
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
